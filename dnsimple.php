@@ -8,10 +8,30 @@ class DNSimple
   public $http_timeout = 8;
   protected $username  = '';
   protected $password  = '';
+  protected $token  = '';
 
   public $debug        = false;
 
+  // SETTERS
+  /**
+   *
+   *
+   */
+  final public function token_set($token)
+  {
+    $this->token = $token;
+  }
 
+  final public function username_set($username)
+  {
+    $this->username = $username;
+  }
+
+  final public function password_set($password)
+  {
+    $this->password = $password;
+  }
+   
   // TEMPLATES
 
   // List DNS templates
@@ -410,14 +430,21 @@ class DNSimple
       CURLOPT_USERAGENT => $this->http_agent,
       CURLOPT_CUSTOMREQUEST => $method,
       CURLOPT_FOLLOWLOCATION => true,
-      CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-      CURLOPT_USERPWD => $this->username . ':' . $this->password,
       CURLOPT_HEADER => false,
       CURLINFO_HEADER_OUT => true,
       CURLOPT_HEADERFUNCTION => array ($this, 'http_headers'),
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0,
-      CURLOPT_HTTPHEADER => $send_headers
     );
+    if ($this->username != '' AND $this->password != '')
+    {
+      $opts[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+      $opts[CURLOPT_USERPWD] = $this->username . ':' . $this->password;
+    }
+    else
+      $send_headers[] = 'X-DNSimple-Domain-Token: '.$this->token;
+
+    $opts[CURLOPT_HTTPHEADER] = $send_headers;
+
 
     # outbound interface (1.2.3.4, eth0, wn1)
     if (!empty($this->http_iface))

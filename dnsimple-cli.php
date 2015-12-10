@@ -11,8 +11,17 @@ error_reporting (E_ALL ^ E_NOTICE);
 
 # REQUIRED !!
 require 'dnsimple.php';
+require 'token.php';
+
 
 $d = new DNSimple;
+
+// to use domain token use this
+$d->token_set($token);
+// to use user password use this
+// $d->username_set($username);
+// $d->password_set($password);
+
 $d->debug = false;
 
 switch ($argv[1])
